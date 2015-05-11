@@ -10,7 +10,7 @@ Vector2.prototype.set = function(a_x , a_y)
 {
 	this.x = a_x;
 	this.y = a_y;
-};
+}
 
 Vector2.prototype.CheckCollision = function(Vector2 , a_Other)
 {
@@ -22,12 +22,12 @@ Vector2.prototype.CheckCollision = function(Vector2 , a_Other)
 		return false;
 	}
 	return true;
-};
+}
 
 Vector2.prototype.magnitude = function ()
 {
 	return Math.sqrt((x*x) + (y*y));
-};
+}
 
 Vector2.prototype.normalised = function()
 {
@@ -36,4 +36,4 @@ Vector2.prototype.normalised = function()
 	ret.y = this.y / this.magnitude();
 	
 	return ret;
-};
+}
