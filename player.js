@@ -62,6 +62,7 @@ var Player = function() {
 	
 	this.direction = LEFT;
 	
+	this.cooldownTimer = 0;
 };
 
 
@@ -73,12 +74,15 @@ Player.prototype.update = function(deltaTime)
 	var right = false;
 	var jump = false;
 
+	var PLAYER_SPEED = 300;
+	
 	// check keypress events
 	if(keyboard.isKeyDown(keyboard.KEY_LEFT) == true) {
 		left = true;
 		this.direction = LEFT;
 		if(this.sprite.currentAnimation != ANIM_WALK_LEFT)
 			this.sprite.setAnimation(ANIM_WALK_LEFT);
+			this.x -= PLAYER_SPEED * deltaTime;
 	}
 	
 	else if(keyboard.isKeyDown(keyboard.KEY_RIGHT) == true) {
@@ -86,6 +90,7 @@ Player.prototype.update = function(deltaTime)
 	this.direction = RIGHT;
 	if(this.sprite.currentAnimation != ANIM_WALK_RIGHT)
 		this.sprite.setAnimation(ANIM_WALK_RIGHT);
+		this.x += PLAYER_SPEED * deltaTime;
 	}
 	
 	else {
@@ -104,8 +109,18 @@ Player.prototype.update = function(deltaTime)
 		}
 	}
 	
-	if(keyboard.isKeyDown(keyboard.KEY_SPACE) == true) {
+	if(keyboard.isKeyDown(keyboard.KEY_UP) == true) {
 		jump = true;
+	}
+	
+	if(this.cooldownTimer > 0)
+	{
+		this.cooldownTimer -= deltaTime;
+	}
+	if(keyboard.isKeyDown(keyboard.KEY_SPACE) == true && this.cooldownTimer <= 0) {
+		sfxFire.play();
+		this.cooldownTimer = 0.3;
+		// Shoot a bullet
 	}
 
 	var wasleft = this.velocity.x < 0;
@@ -207,5 +222,5 @@ Player.prototype.update = function(deltaTime)
 
 Player.prototype.draw = function()
 {
-	this.sprite.draw(context, this.position.x, this.position.y);
+	this.sprite.draw(context, this.position.x - worldOffsetX, this.position.y);
 }

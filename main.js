@@ -75,7 +75,7 @@ tileset.src = "tileset.png";
 // abitrary choice for 1m
 var METER = TILE;
 // very exaggerated gravity (6x)
-var GRAVITY = METER * 9.8 * 6;
+var GRAVITY = METER * 9.8 * 4;
 // max horizontal speed (10 tiles per second)
 var MAXDX = METER * 10;
 // max vertical speed (15 tiles per second)
@@ -91,6 +91,9 @@ var LAYER_COUNT = 3;
 var LAYER_BACKGOUND = 0;
 var LAYER_PLATFORMS = 1;
 var LAYER_LADDERS = 2;
+
+var musicBackground;
+var sfxFire;
 
 var cells = []; // the array that holds our simplified collision data
 function initialize() {
@@ -117,6 +120,25 @@ function initialize() {
 			}
 		}
 	}
+	
+	musicBackground = new Howl(
+	{
+		urls: ["background.ogg"],
+		loop: true,
+		buffer: true,
+		volume: 0.5
+	} );
+	musicBackground.play();
+	
+	sfxFire = new Howl(
+	{
+		urls: ["fireEffect.ogg"],
+		buffer: true,
+		volume: 1,
+		onend: function() {
+			isSfxPlaying = false;
+		}
+	} );
 }
 
 //BEFORE drawMap
@@ -162,27 +184,54 @@ function bound(value, min, max)
 //draw the map
 function drawMap()
 {
-	for(var layerIdx=0; layerIdx<LAYER_COUNT; layerIdx++)
+	//calculate screen +2
+	var maxTiles = Math.floor(SCREEN_WIDTH / TILE) + 2;
+	//calculate tile player is on
+	var tileX = pixelToTile(player.position.x);
+	//calculate offset of player from tile
+	var offsetX = TILE + Math.floor(player.position.x%TILE);
+	
+	//scrolling mechanics
+	startX = tileX - Math.floor(maxTiles / 2);
+	if(startX < -1)
 	{
-		var idx = 0;
+		startX = 0;
+		offsetX = 0;
+	}
+	if(startX > MAP.tw - maxTiles)
+	{
+		startX = MAP.tw - maxTiles + 1;
+		offsetX = TILE;
+	}
+	
+	//x-axis offset (amount of world scrolled)
+	worldOffsetX = startX * TILE + offsetX;
+	
+	for( var layerIdx=0; layerIdx < LAYER_COUNT; layerIdx++ )
+	{
 		for( var y = 0; y < level1.layers[layerIdx].height; y++ )
 		{
-			for( var x = 0; x < level1.layers[layerIdx].width; x++ )
+			var idx = y * level1.layers[layerIdx].width + startX;
+			for( var x = startX; x < startX + maxTiles; x++ )
 			{
 				if( level1.layers[layerIdx].data[idx] != 0 )
 				{
-					
-					// the tiles in the Tiled map are base 1 (meaning a value of 0 means no tile), so subtract one from the tileset id to get the
+					// the tiles in the Tiled map are base 1 (meaning a value of 0 means no tile),
+					// so subtract one from the tileset id to get the
 					// correct tile
 					var tileIndex = level1.layers[layerIdx].data[idx] - 1;
-					var sx = TILESET_PADDING + (tileIndex % TILESET_COUNT_X) * (TILESET_TILE + TILESET_SPACING);
-					var sy = TILESET_PADDING + (Math.floor(tileIndex / TILESET_COUNT_Y)) * (TILESET_TILE + TILESET_SPACING);
-					context.drawImage(tileset, sx, sy, TILESET_TILE, TILESET_TILE, x*TILE, (y-1)*TILE, TILESET_TILE, TILESET_TILE);
+					var sx = TILESET_PADDING + (tileIndex % TILESET_COUNT_X) *
+						(TILESET_TILE + TILESET_SPACING);
+					var sy = TILESET_PADDING + (Math.floor(tileIndex / TILESET_COUNT_Y)) *
+						(TILESET_TILE + TILESET_SPACING);
+					context.drawImage(tileset, sx, sy, TILESET_TILE, TILESET_TILE,
+						(x-startX)*TILE - offsetX, (y-1)*TILE, TILESET_TILE, TILESET_TILE);
 				}
-				idx++;
+			idx++;
 			}
 		}
 	}
+	
 }
 
 
@@ -194,10 +243,9 @@ function run()
 
 	var deltaTime = getDeltaTime();
 	
+	player.update(deltaTime);
 	drawMap();
 	player.draw();
-	player.update(deltaTime);
-	
 
 		// update the frame counter
 
