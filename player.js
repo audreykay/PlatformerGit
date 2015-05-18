@@ -15,10 +15,10 @@ var ANIM_MAX = 9;
 var Player = function() {
 	
 	this.sprite = new Sprite("ChuckNorris.png");
-	// idling left
+	//idling left
 	this.sprite.buildAnimation(12, 8, 165, 126, 0.05,
 		[0, 1, 2, 3, 4, 5, 6, 7]);
-	// jump left
+	//jump left
 	this.sprite.buildAnimation(12, 8, 165, 126, 0.05,
 		[8, 9, 10, 11, 12]);
 	//walk left
@@ -43,7 +43,6 @@ var Player = function() {
 	this.sprite.buildAnimation(12, 8, 165, 126, 0.05,
 		[79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92]);
 
-		
 	for(var i=0; i<ANIM_MAX; i++)
 	{
 		this.sprite.setAnimationOffset(i, -55, -87);
@@ -51,7 +50,7 @@ var Player = function() {
 	
 	
 	this.position = new Vector2();
-	this.position.set( 9*35 , 0 );
+	this.position.set( 0 , 0 );
 	
 	this.width = 159;
 	this.height = 163;

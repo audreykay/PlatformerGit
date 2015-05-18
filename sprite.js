@@ -51,7 +51,7 @@ Sprite.prototype.setLoop = function(loop) {
 };
 
 Sprite.prototype.setAnimationOffset = function(anim, x, y) {
-	this.offsets[0].set(-55, -87);
+	this.offsets[anim].set(x, y);
 };
 
 Sprite.prototype.getAnimationOffset = function() {
