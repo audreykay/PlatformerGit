@@ -123,7 +123,7 @@ function initialize() {
 	
 	musicBackground = new Howl(
 	{
-		urls: ["background.ogg"],
+		urls: ["fuckimusm.mp3"],
 		loop: true,
 		buffer: true,
 		volume: 0.5
