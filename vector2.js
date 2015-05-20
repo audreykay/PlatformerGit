@@ -6,10 +6,10 @@ var Vector2 = function()
 
 };
 
-Vector2.prototype.set = function(a_x , a_y)
+Vector2.prototype.set = function(x , y)
 {
-	this.x = a_x;
-	this.y = a_y;
+	this.x = 0;
+	this.y = 0;
 }
 
 Vector2.prototype.CheckCollision = function(Vector2 , a_Other)
