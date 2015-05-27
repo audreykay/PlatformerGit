@@ -93,6 +93,7 @@ Player.prototype.update = function(deltaTime)
 			this.x += PLAYER_SPEED * deltaTime;
 	}
 	
+	
 	else {
 		if(this.jumping == false && this.falling == false)
 		{
@@ -217,6 +218,7 @@ Player.prototype.update = function(deltaTime)
 			this.velocity.x = 0; // stop horizontal velocity
 		}
 	}
+	
 	player.falling= ! (celldown|| (nx&& celldiag));
 }
 

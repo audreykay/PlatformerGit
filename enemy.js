@@ -1,12 +1,11 @@
-
-var Enemy = function() {
+var Enemy = function(x, y) {
 	
-	this.sprite = new Sprite("enemy.png");
+	this.sprite = new Sprite("bat.png");
 	this.sprite.buildAnimation(2, 1, 88, 94, 0.3, [0,1]);
 	this.sprite.setAnimationOffset(0, -35, -40);
 	
 	this.position = new Vector2();
-	this.position.set(0 , 0);
+	this.position.set();
 	
 	this.velocity = new Vector2();
 	
@@ -64,11 +63,11 @@ Enemy.prototype.update = function(deltaTime)
 		
 		this.position.x = Math.floor(this.position.x + (deltaTime * this.velocity.x));
 		this.velocity.x = bound(this.velocity.x + (deltaTime * ddx),
-									-ENEMY_MAXDX, ENEMY_MAXDX);
+			-ENEMY_MAXDX, ENEMY_MAXDX);
 	}
 }
 
-Player.prototype.draw = function()
+Enemy.prototype.draw = function()
 {
 	this.sprite.draw(context, this.position.x, this.position.y);
 }

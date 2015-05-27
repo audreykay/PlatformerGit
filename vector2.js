@@ -8,8 +8,8 @@ var Vector2 = function()
 
 Vector2.prototype.set = function(x , y)
 {
-	this.x = 0;
-	this.y = 0;
+	this.x = x;
+    this.y = y;
 }
 
 Vector2.prototype.CheckCollision = function(Vector2 , a_Other)
