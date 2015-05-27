@@ -129,8 +129,8 @@ function initialize() {
 			}
 		}
 		
-		/*// add enemies
-		idx = 0;
+		// add enemies
+		idx;
 			for(var y = 0; y < level1.layers[LAYER_OBJECT_ENEMIES].height; y++)
 			{
 				for(var x = 0; x < level1.layers[LAYER_OBJECT_ENEMIES].width; x++)
@@ -144,7 +144,7 @@ function initialize() {
 					}
 					idx++;
 				}
-			}*/
+			}
 	}
 	
 
@@ -154,7 +154,7 @@ function initialize() {
 		urls: ["background.ogg"],
 		loop: true,
 		buffer: true,
-		volume: 0.5
+		volume: 0.1
 	} );
 	musicBackground.play();
 	
@@ -170,7 +170,7 @@ function initialize() {
 }
 
 //BEFORE drawMap
-function cellAtPixelCoord(layer, x,y)
+function cellAtPixelCoord(layer, x, y)
 {
 	if(x < 0 || x > SCREEN_WIDTH || y < 0)
 		return 1;
