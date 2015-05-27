@@ -87,22 +87,13 @@ var FRICTION = MAXDX * 6;
 // (a large) instantaneous jump impulse
 var JUMP = METER * 1500;
 
-var musicBackground;
-var sfxFire;
-
-//enemy variables
-var ENEMY_MAXDX = METER * 5;
-var ENEMY_ACCEL = ENEMY_MAXDX * 2;
-
-var enemies = [];
-
 var LAYER_COUNT = 3;
 var LAYER_BACKGOUND = 0;
 var LAYER_PLATFORMS = 1;
 var LAYER_LADDERS = 2;
 
-var LAYER_OBJECT_ENEMIES = 3;
-
+var musicBackground;
+var sfxFire;
 
 var cells = []; // the array that holds our simplified collision data
 function initialize() {
@@ -127,21 +118,6 @@ function initialize() {
 				}
 				idx++;
 			}
-		}
-		
-	}
-	
-	// add enemies
-	idx = 0;
-	for(var y = 0; y < level1.layers[LAYER_OBJECT_ENEMIES].height; y++) {
-		for(var x = 0; x < level1.layers[LAYER_OBJECT_ENEMIES].width; x++) {
-			if(level1.layers[LAYER_OBJECT_ENEMIES].data[idx] != 0) {
-				var px = tileToPixel(x);
-				var py = tileToPixel(y);
-				var e = new Enemy(px, py);
-				enemies.push(e);
-			}
-			idx++;
 		}
 	}
 	
@@ -270,27 +246,22 @@ function run()
 	player.update(deltaTime);
 	drawMap();
 	player.draw();
-	
-	// update the frame counter
 
-	fpsTime += deltaTime;
-	fpsCount++;
-	if(fpsTime >= 1)
-	{
-		fpsTime -= 1;
-		fps = fpsCount;
-		fpsCount = 0;
-	}
+		// update the frame counter
+
+		fpsTime += deltaTime;
+		fpsCount++;
+		if(fpsTime >= 1)
+		{
+			fpsTime -= 1;
+			fps = fpsCount;
+			fpsCount = 0;
+		}
 		
-	// draw the FPS
-	context.fillStyle = "#f00";
-	context.font="14px Arial";
-	context.fillText("FPS: " + fps, 5, 20, 100);
-	
-	for(var i=0; i<enemies.length; i++)
-	{
-		enemies[i].update(deltaTime);
-	}
+		// draw the FPS
+		context.fillStyle = "#f00";
+		context.font="14px Arial";
+		context.fillText("FPS: " + fps, 5, 20, 100);
 }
 
 //initialize AFTER run function

@@ -50,7 +50,7 @@ var Player = function() {
 	
 	
 	this.position = new Vector2();
-	this.position.set( 35 , 0 );
+	this.position.set( 0 , 0 );
 	
 	this.width = 159;
 	this.height = 163;
@@ -86,11 +86,11 @@ Player.prototype.update = function(deltaTime)
 	}
 	
 	else if(keyboard.isKeyDown(keyboard.KEY_RIGHT) == true) {
-		right = true;
-		this.direction = RIGHT;
-		if(this.sprite.currentAnimation != ANIM_WALK_RIGHT)
-			this.sprite.setAnimation(ANIM_WALK_RIGHT);
-			this.x += PLAYER_SPEED * deltaTime;
+	right = true;
+	this.direction = RIGHT;
+	if(this.sprite.currentAnimation != ANIM_WALK_RIGHT)
+		this.sprite.setAnimation(ANIM_WALK_RIGHT);
+		this.x += PLAYER_SPEED * deltaTime;
 	}
 	
 	else {
