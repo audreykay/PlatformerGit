@@ -43,6 +43,13 @@ var fpsTime = 0;
 // load an image to draw
 var player = new Player();
 var keyboard = new Keyboard();
+var blueHud = new BlueHud();
+
+//GAME STATES
+var STATE_SPLASH = 0;
+var STATE_GAME = 1;
+var STATE_GAMEOVER = 2;
+var gameState = STATE_SPLASH;
 
 var LAYER_COUNT = 3;
 //The number of layers in your map. In the sample from this week’s lesson we’re using
@@ -90,11 +97,23 @@ var JUMP = METER * 1500;
 var musicBackground;
 var sfxFire;
 
+//HUD variables
+var exitTrig = {image: document.createElement("img")};
+exitTrig.image.src = "signExit.png";
+
+
 //enemy variables
 var ENEMY_MAXDX = METER * 5;
 var ENEMY_ACCEL = ENEMY_MAXDX * 2;
 
+//arrays
 var enemies = [];
+var bullets = [];
+var exits = [];
+var blueKeys = [];
+var greenKeys = [];
+var redKeys = [];
+var yellowKeys = [];
 
 var LAYER_COUNT = 3;
 
@@ -102,6 +121,7 @@ var LAYER_BACKGOUND = 0;
 var LAYER_PLATFORMS = 1;
 var LAYER_LADDERS = 2;
 var LAYER_OBJECT_ENEMIES = 3;
+var LAYER_OBJECT_TRIGGERS = 4;
 
 
 var cells = []; // the array that holds our simplified collision data
@@ -130,7 +150,7 @@ function initialize() {
 		}
 		
 		// add enemies
-		idx;
+		idx = 0;
 			for(var y = 0; y < level1.layers[LAYER_OBJECT_ENEMIES].height; y++)
 			{
 				for(var x = 0; x < level1.layers[LAYER_OBJECT_ENEMIES].width; x++)
@@ -145,16 +165,82 @@ function initialize() {
 					idx++;
 				}
 			}
+			
+		// initialize trigger layer in collision map
+		cells[LAYER_OBJECT_TRIGGERS] = [];
+		idx = 0;
+		for(var y = 0; y < level1.layers[LAYER_OBJECT_TRIGGERS].height; y++) {
+			cells[LAYER_OBJECT_TRIGGERS][y] = [];
+			for(var x = 0; x < level1.layers[LAYER_OBJECT_TRIGGERS].width; x++) {
+				if(level1.layers[LAYER_OBJECT_TRIGGERS].data[idx] != 0) {
+					
+					cells[LAYER_OBJECT_TRIGGERS][y][x] = 1;
+					cells[LAYER_OBJECT_TRIGGERS][y-1][x] = 1;
+					cells[LAYER_OBJECT_TRIGGERS][y-1][x+1] = 1;
+					cells[LAYER_OBJECT_TRIGGERS][y][x+1] = 1;
+				
+					if(level1.layers[LAYER_OBJECT_TRIGGERS].data[idx] == 163) 
+					{
+						var px = tileToPixel(x);
+						var py = tileToPixel(y);
+						var exit = new Exit(px, py);
+						exits.push(exit);
+					}
+					
+					if(level1.layers[LAYER_OBJECT_TRIGGERS].data[idx] == 174) 
+					{
+						var px = tileToPixel(x);
+						var py = tileToPixel(y);
+						var blue = new BlueKey(px, py);
+						blueKeys.push(blue);
+					}
+					
+					if(level1.layers[LAYER_OBJECT_TRIGGERS].data[idx] == 175) 
+					{
+						var px = tileToPixel(x);
+						var py = tileToPixel(y);
+						var green = new GreenKey(px, py);
+						greenKeys.push(green);
+					}
+					
+					if(level1.layers[LAYER_OBJECT_TRIGGERS].data[idx] == 176) 
+					{
+						var px = tileToPixel(x);
+						var py = tileToPixel(y);
+						var red = new RedKey(px, py);
+						redKeys.push(red);
+					}
+					
+					if(level1.layers[LAYER_OBJECT_TRIGGERS].data[idx] == 177) 
+					{
+						var px = tileToPixel(x);
+						var py = tileToPixel(y);
+						var yellow = new YellowKey(px, py);
+						yellowKeys.push(yellow);
+					}
+					
+				
+				}
+				
+				if(cells[LAYER_OBJECT_TRIGGERS][y][x] != 1) {
+					// if we haven't set this cell's value, then set it to 0 now
+					cells[LAYER_OBJECT_TRIGGERS][y][x] = 0;
+				}
+				
+				
+				idx++;
+			}
+		}
 	}
 	
-
+	
 	
 	musicBackground = new Howl(
 	{
 		urls: ["background.ogg"],
 		loop: true,
 		buffer: true,
-		volume: 0.1
+		volume: 0
 	} );
 	musicBackground.play();
 	
@@ -262,7 +348,55 @@ function drawMap()
 	
 }
 
+//GAME STATES
+function runSplash(deltaTime)
+{
+	context.fillStyle = "#ccc";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	
+	if(keyboard.isKeyDown(keyboard.KEY_SPACE) == true) {
+		gameState = STATE_GAME;
+		return;
+	}
+	
+	context.fillStyle = "#000";
+	context.font="24px Arial";
+	context.fillText("SPLASH SCREEN", 200, 240);
+}
 
+function runGame(deltaTime)
+{
+		//background
+	context.fillStyle = "#ccc";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	
+	//deltaTime
+	var deltaTime = getDeltaTime();
+	
+	//SWITCHING GAME STATES
+	switch(gameState)
+	{
+		case STATE_SPLASH:
+			runSplash(deltaTime);
+			break;
+		case STATE_GAME:
+			run(deltaTime);
+			break;
+		case STATE_GAMEOVER:
+			runGameOver(deltaTime);
+			break;
+	}
+}
+
+function runGameOver(deltaTime)
+{
+	context.fillStyle = "#ccc";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	
+	context.fillStyle = "#000";
+	context.font="24px Arial";
+	context.fillText("GAME OVER", 200, 240);
+}
 
 //run function
 function run()
@@ -275,6 +409,10 @@ function run()
 	player.update(deltaTime);
 	drawMap();
 	player.draw();
+	blueHud.update(deltaTime);
+	blueHud.draw();
+	
+	
 	
 	// update the frame counter
 
@@ -292,6 +430,7 @@ function run()
 	context.font="14px Arial";
 	context.fillText("FPS: " + fps, 5, 20, 100);
 	
+	//enemies
 	for(var i=0; i<enemies.length; i++)
 	{
 		enemies[i].update(deltaTime);
@@ -299,6 +438,100 @@ function run()
 	for(var i=0; i<enemies.length; i++)
 	{
 		enemies[i].draw(deltaTime);
+	}
+	
+	//triggers
+	
+	//exit
+		for(var i=0; i<exits.length; i++)
+	{
+		exits[i].update(deltaTime);
+	}
+	for(var i=0; i<exits.length; i++)
+	{
+		exits[i].draw(deltaTime);
+	}
+	
+	//blueKeys
+		for(var i=0; i<blueKeys.length; i++)
+	{
+		blueKeys[i].update(deltaTime);
+	}
+	for(var i=0; i<blueKeys.length; i++)
+	{
+		blueKeys[i].draw(deltaTime);
+	}
+	//greenKeys
+		for(var i=0; i<greenKeys.length; i++)
+	{
+		greenKeys[i].update(deltaTime);
+	}
+	for(var i=0; i<greenKeys.length; i++)
+	{
+		greenKeys[i].draw(deltaTime);
+	}
+	
+	//redKeys
+		for(var i=0; i<redKeys.length; i++)
+	{
+		redKeys[i].update(deltaTime);
+	}
+	for(var i=0; i<redKeys.length; i++)
+	{
+		redKeys[i].draw(deltaTime);
+	}
+	
+	//yellowKeys
+		for(var i=0; i<yellowKeys.length; i++)
+	{
+		yellowKeys[i].update(deltaTime);
+	}
+	for(var i=0; i<yellowKeys.length; i++)
+	{
+		yellowKeys[i].draw(deltaTime);
+	}
+	
+	
+	
+	
+	
+	//bullets
+	var hit=false;
+	for(var i=0; i<bullets.length; i++)
+		{
+			bullets[i].draw(deltaTime);
+			bullets[i].update(deltaTime);
+			if( bullets[i].position.x - worldOffsetX < 0 ||
+				bullets[i].position.x - worldOffsetX > SCREEN_WIDTH)
+			{
+				hit = true;
+			}
+			
+			for(var j=0; j<enemies.length; j++)
+			{
+				if(intersects( bullets[i].position.x, bullets[i].position.y, TILE, TILE,
+				enemies[j].position.x, enemies[j].position.y, TILE, TILE) == true)
+				{
+					// kill both the bullet and the enemy
+					enemies.splice(j, 1);
+					hit = true;
+					// increment the player score
+					score += 1;
+					break;
+				}
+			}
+			if(hit == true)
+			{
+				bullets.splice(i, 1);
+				break;
+			}
+			
+		}
+	
+	
+	for(var i=0; i<bullets.length; i++)
+	{
+		bullets[i].draw(deltaTime);
 	}
 }
 

@@ -50,7 +50,7 @@ var Player = function() {
 	
 	
 	this.position = new Vector2();
-	this.position.set( 35 , 0 );
+	this.position.set( 35 , 250 );
 	
 	this.width = 159;
 	this.height = 163;
@@ -122,6 +122,47 @@ Player.prototype.update = function(deltaTime)
 		sfxFire.play();
 		this.cooldownTimer = 0.3;
 		// Shoot a bullet
+	
+		var bullet = new Bullet(player.position.x, player.position.y, this.wasRight);
+		
+				for(var i=0; 0<bullets.length; i++)
+		{
+			sprite.draw;
+		
+			if(this.direction == RIGHT)
+			{
+				right = true;
+				this.direction = RIGHT;
+				if(this.sprite.currentAnimation != ANIM_SHOOT_RIGHT)
+					this.sprite.setAnimation(ANIM_SHOOT_RIGHT);
+				
+				bullets.push(bullet);
+			}
+			else
+			{
+				left = true;
+				this.direction = LEFT;
+				if(this.sprite.currentAnimation != ANIM_SHOOT_LEFT)
+					this.sprite.setAnimation(ANIM_SHOOT_LEFT);
+				
+				bullets.push(bullet);
+			}
+			
+		}
+	
+	
+	
+	
+		/*var b = new Bullet{
+	
+		this.position = new Vector2();
+		this.position.set(player.x, player.y);
+	
+		this.velocity = new Vector2();
+	
+		this.moveRight = true;
+		bullets.push(b);
+		};*/
 	}
 
 	var wasleft = this.velocity.x < 0;
@@ -220,6 +261,16 @@ Player.prototype.update = function(deltaTime)
 	}
 	
 	player.falling= ! (celldown|| (nx&& celldiag));
+	
+	idx = 0;
+	//TRIGGERS
+	if(cellAtTileCoord(LAYER_OBJECT_TRIGGERS, tx, ty) == true)
+	{
+		var blueHud = new BlueHud();
+			blueHud.update(deltaTime);
+			blueHud.draw();
+		
+	}
 }
 
 Player.prototype.draw = function()
