@@ -12,6 +12,7 @@ var ANIM_SHOOT_RIGHT = 8;
 var ANIM_MAX = 9;
 
 
+
 var Player = function() {
 	
 	this.sprite = new Sprite("ChuckNorris.png");
@@ -59,6 +60,8 @@ var Player = function() {
 	
 	this.falling = true;
 	this.jumping = false;
+	
+	this.isDead = false;
 	
 	this.direction = LEFT;
 	
@@ -123,46 +126,36 @@ Player.prototype.update = function(deltaTime)
 		this.cooldownTimer = 0.3;
 		// Shoot a bullet
 	
-		var bullet = new Bullet(player.position.x, player.position.y, this.wasRight);
-		
-				for(var i=0; 0<bullets.length; i++)
+		var	bullet = new Bullet((this.position.x), this.position.y);
+		if(this.direction == LEFT)
 		{
-			sprite.draw;
-		
-			if(this.direction == RIGHT)
-			{
-				right = true;
-				this.direction = RIGHT;
-				if(this.sprite.currentAnimation != ANIM_SHOOT_RIGHT)
-					this.sprite.setAnimation(ANIM_SHOOT_RIGHT);
-				
-				bullets.push(bullet);
-			}
-			else
-			{
-				left = true;
-				this.direction = LEFT;
-				if(this.sprite.currentAnimation != ANIM_SHOOT_LEFT)
-					this.sprite.setAnimation(ANIM_SHOOT_LEFT);
-				
-				bullets.push(bullet);
-			}
-			
+			left = true;
+			if(this.sprite.currentAnimation != ANIM_SHOOT_LEFT)
+				this.sprite.setAnimation(ANIM_SHOOT_LEFT);
 		}
+		else
+		{
+			right = true;
+			if(this.sprite.currentAnimation != ANIM_SHOOT_RIGHT)
+				this.sprite.setAnimation(ANIM_SHOOT_RIGHT);
+		}
+
+		if(right == true)
+		{
+			bullet.velocity.x = 400; //set direction for bullet
+			bullet.position.x += 50;
+			bullet.position.y -= 20;
+		}
+		else
+		{
+			bullet.velocity.x = -400; //set direction for bullet
+			bullet.position.x -= 40;
+			bullet.position.y -= 20;
+		}
+									
+		cooldownTimer = 0.5;			//set bullet timer to 0.5 seconds
+		bullets.push(bullet);		//add bullet to bullets array
 	
-	
-	
-	
-		/*var b = new Bullet{
-	
-		this.position = new Vector2();
-		this.position.set(player.x, player.y);
-	
-		this.velocity = new Vector2();
-	
-		this.moveRight = true;
-		bullets.push(b);
-		};*/
 	}
 
 	var wasleft = this.velocity.x < 0;
@@ -266,11 +259,58 @@ Player.prototype.update = function(deltaTime)
 	//TRIGGERS
 	if(cellAtTileCoord(LAYER_OBJECT_TRIGGERS, tx, ty) == true)
 	{
-		var blueHud = new BlueHud();
-			blueHud.update(deltaTime);
-			blueHud.draw();
+		
+	
+		/*//blue
+		for (var i=0; i<blueKeys.length; i++)
+		{
+			if (intersects (player.x, player.y, 
+				player.height/2, player.width/2, 
+				blueKeys[i].x, blueKeys[i].y, 
+				blueKeys[i].width, blueKeys[i].height) == true)
+			{
+				blueLife = true;
+				score = score + 10;
+				blueKeys.splice(i, 1);
+				//player.isDead = true;
+				break;
+			}
+			//else 
+			//{
+			//	blueLife = false;
+			//}
+		
+		
+		}
+		//green
+		for (var j=0; j<greenKeys.length; j++)
+		{
+			if (intersects (player.x, player.y, 
+				player.height/2, player.width/2, 
+				greenKeys[j].x, greenKeys[j].y, 
+				greenKeys[j].width, greenKeys[j].height) == true)
+			{
+				greenLife = true;
+				score = score + 10;
+				greenKeys.splice(j, 1);
+				//player.isDead = true;
+				break;
+				
+			}
+			else 
+			{
+				greenLife = false;
+			}
+		}*/
 		
 	}
+	
+		
+		
+		
+	
+		
+	
 }
 
 Player.prototype.draw = function()

@@ -6,7 +6,7 @@ var BlueHud = function(x, y)
 	this.sprite.setLoop(0, false);
 	
 	this.position = new Vector2();
-	this.position.set(100 , 100);
+	this.position.set(x, y);
 	
 }
 BlueHud.prototype.update = function(deltaTime)

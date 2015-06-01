@@ -98,9 +98,68 @@ var musicBackground;
 var sfxFire;
 
 //HUD variables
-var exitTrig = {image: document.createElement("img")};
-exitTrig.image.src = "signExit.png";
+var heartImage = document.createElement("img");
+heartImage.src = "hud_heartFull.png";
+//blue
+var blueLife = false;
+var blueHud = {
+	image: document.createElement("img"),
+	width: 44,
+	height: 40
+};
+blueHud.image.src = "hud_keyBlue.png";
+var blueHudDis = {
+	image: document.createElement("img"),
+	width: 44,
+	height: 40
+};
+blueHudDis.image.src = "hud_keyBlue_disabled.png";
+//green
+var greenLife = false;
+var greenHud = {
+	image: document.createElement("img"),
+	width: 44,
+	height: 40
+};
+greenHud.image.src = "hud_keyGreen.png";
+var greenHudDis = {
+	image: document.createElement("img"),
+	width: 44,
+	height: 40
+};
+greenHudDis.image.src = "hud_keyGreen_disabled.png";
+//red
+var redLife = false;
+var redHud = {
+	image: document.createElement("img"),
+	width: 44,
+	height: 40
+};
+redHud.image.src = "hud_keyRed.png";
+var redHudDis = {
+	image: document.createElement("img"),
+	width: 44,
+	height: 40
+};
+redHudDis.image.src = "hud_keyRed_disabled.png";
+//yellow
+var yellowLife = false;
+var yellowHud = {
+	image: document.createElement("img"),
+	width: 44,
+	height: 40
+};
+yellowHud.image.src = "hud_keyYellow.png";
+var yellowHudDis = {
+	image: document.createElement("img"),
+	width: 44,
+	height: 40
+};
+yellowHudDis.image.src = "hud_keyYellow_disabled.png";
 
+
+var score = 0;
+var lives = 3;
 
 //enemy variables
 var ENEMY_MAXDX = METER * 5;
@@ -122,6 +181,19 @@ var LAYER_PLATFORMS = 1;
 var LAYER_LADDERS = 2;
 var LAYER_OBJECT_ENEMIES = 3;
 var LAYER_OBJECT_TRIGGERS = 4;
+
+//collision detection
+function intersects(x1, y1, w1, h1, x2, y2, w2, h2)
+{
+	if(y2 + h2 < y1 ||
+		x2 + w2 < x1 ||
+		x2 > x1 + w1 ||
+		y2 > y1 + h1)
+	{
+		return false;
+	}
+	return true;
+}
 
 
 var cells = []; // the array that holds our simplified collision data
@@ -187,13 +259,17 @@ function initialize() {
 						exits.push(exit);
 					}
 					
+					
 					if(level1.layers[LAYER_OBJECT_TRIGGERS].data[idx] == 174) 
 					{
 						var px = tileToPixel(x);
 						var py = tileToPixel(y);
 						var blue = new BlueKey(px, py);
 						blueKeys.push(blue);
+						
 					}
+					
+				
 					
 					if(level1.layers[LAYER_OBJECT_TRIGGERS].data[idx] == 175) 
 					{
@@ -219,8 +295,8 @@ function initialize() {
 						yellowKeys.push(yellow);
 					}
 					
-				
 				}
+				
 				
 				if(cells[LAYER_OBJECT_TRIGGERS][y][x] != 1) {
 					// if we haven't set this cell's value, then set it to 0 now
@@ -240,7 +316,7 @@ function initialize() {
 		urls: ["background.ogg"],
 		loop: true,
 		buffer: true,
-		volume: 0
+		volume: 0.3
 	} );
 	musicBackground.play();
 	
@@ -349,71 +425,18 @@ function drawMap()
 }
 
 //GAME STATES
-function runSplash(deltaTime)
-{
-	context.fillStyle = "#ccc";
-	context.fillRect(0, 0, canvas.width, canvas.height);
-	
-	if(keyboard.isKeyDown(keyboard.KEY_SPACE) == true) {
-		gameState = STATE_GAME;
-		return;
-	}
-	
-	context.fillStyle = "#000";
-	context.font="24px Arial";
-	context.fillText("SPLASH SCREEN", 200, 240);
-}
 
-function runGame(deltaTime)
-{
-		//background
-	context.fillStyle = "#ccc";
-	context.fillRect(0, 0, canvas.width, canvas.height);
-	
-	//deltaTime
-	var deltaTime = getDeltaTime();
-	
-	//SWITCHING GAME STATES
-	switch(gameState)
-	{
-		case STATE_SPLASH:
-			runSplash(deltaTime);
-			break;
-		case STATE_GAME:
-			run(deltaTime);
-			break;
-		case STATE_GAMEOVER:
-			runGameOver(deltaTime);
-			break;
-	}
-}
-
-function runGameOver(deltaTime)
-{
-	context.fillStyle = "#ccc";
-	context.fillRect(0, 0, canvas.width, canvas.height);
-	
-	context.fillStyle = "#000";
-	context.font="24px Arial";
-	context.fillText("GAME OVER", 200, 240);
-}
 
 //run function
 function run()
 {
-	context.fillStyle = "#ccc";
+		context.fillStyle = "#ccc";
 	context.fillRect(0, 0, canvas.width, canvas.height);
 
 	var deltaTime = getDeltaTime();
 	
+	//UPDATE
 	player.update(deltaTime);
-	drawMap();
-	player.draw();
-	blueHud.update(deltaTime);
-	blueHud.draw();
-	
-	
-	
 	// update the frame counter
 
 	fpsTime += deltaTime;
@@ -424,82 +447,42 @@ function run()
 		fps = fpsCount;
 		fpsCount = 0;
 	}
-		
-	// draw the FPS
-	context.fillStyle = "#f00";
-	context.font="14px Arial";
-	context.fillText("FPS: " + fps, 5, 20, 100);
 	
-	//enemies
-	for(var i=0; i<enemies.length; i++)
-	{
-		enemies[i].update(deltaTime);
-	}
-	for(var i=0; i<enemies.length; i++)
-	{
-		enemies[i].draw(deltaTime);
-	}
-	
-	//triggers
-	
+
 	//exit
 		for(var i=0; i<exits.length; i++)
 	{
 		exits[i].update(deltaTime);
 	}
-	for(var i=0; i<exits.length; i++)
-	{
-		exits[i].draw(deltaTime);
-	}
-	
 	//blueKeys
 		for(var i=0; i<blueKeys.length; i++)
 	{
 		blueKeys[i].update(deltaTime);
-	}
-	for(var i=0; i<blueKeys.length; i++)
-	{
-		blueKeys[i].draw(deltaTime);
 	}
 	//greenKeys
 		for(var i=0; i<greenKeys.length; i++)
 	{
 		greenKeys[i].update(deltaTime);
 	}
-	for(var i=0; i<greenKeys.length; i++)
-	{
-		greenKeys[i].draw(deltaTime);
-	}
-	
 	//redKeys
 		for(var i=0; i<redKeys.length; i++)
 	{
 		redKeys[i].update(deltaTime);
 	}
-	for(var i=0; i<redKeys.length; i++)
-	{
-		redKeys[i].draw(deltaTime);
-	}
-	
 	//yellowKeys
 		for(var i=0; i<yellowKeys.length; i++)
 	{
 		yellowKeys[i].update(deltaTime);
 	}
-	for(var i=0; i<yellowKeys.length; i++)
+		//enemies
+	for(var i=0; i<enemies.length; i++)
 	{
-		yellowKeys[i].draw(deltaTime);
+		enemies[i].update(deltaTime);
 	}
-	
-	
-	
-	
-	
 	//bullets
 	var hit=false;
 	for(var i=0; i<bullets.length; i++)
 		{
-			bullets[i].draw(deltaTime);
 			bullets[i].update(deltaTime);
 			if( bullets[i].position.x - worldOffsetX < 0 ||
 				bullets[i].position.x - worldOffsetX > SCREEN_WIDTH)
@@ -527,13 +510,252 @@ function run()
 			}
 			
 		}
+		
+	for(var j=0; j<enemies.length; j++)
+		{
+			if(player.isDead == false)
+			{
+				if(intersects(enemies[j].position.x, enemies[j].position.y, TILE, TILE,
+					player.position.x, player.position.y, player.width/2, player.height/2)== true)
+				{
+				lives -= 1;
+				player.position.set(35, 250);
+				}
+			}
+		}
+		
 	
+	//trigger collision detection
+	for(var i=0; i<blueKeys.length; i++)
+		{
+			if(intersects(blueKeys[i].position.x, blueKeys[i].position.y, TILE, TILE,
+					player.position.x, player.position.y, player.width/2, player.height/2)== true)
+			{
+				blueLife = true;
+				score = score + 10;
+				blueKeys.splice(i, 1);
+				//player.isDead = true;
+				break;
+			}
+		}
+	for(var i=0; i<greenKeys.length; i++)
+		{
+		if(intersects(greenKeys[i].position.x, greenKeys[i].position.y, TILE, TILE,
+					player.position.x, player.position.y, player.width/2, player.height/2)== true)
+			{
+				greenLife = true;
+				score = score + 10;
+				greenKeys.splice(i, 1);
+				//player.isDead = true;
+				break;
+			}
+		}
+	for(var i=0; i<redKeys.length; i++)
+		{
+		if(intersects(redKeys[i].position.x, redKeys[i].position.y, TILE, TILE,
+					player.position.x, player.position.y, player.width/2, player.height/2)== true)
+			{
+				redLife = true;
+				score = score + 10;
+				redKeys.splice(i, 1);
+				//player.isDead = true;
+				break;
+			}
+			
+		}
+	for(var i=0; i<yellowKeys.length; i++)
+		{
+		if(intersects(yellowKeys[i].position.x, yellowKeys[i].position.y, TILE, TILE,
+					player.position.x, player.position.y, player.width/2, player.height/2)== true)
+			{
+				yellowLife = true;
+				score = score + 10;
+				yellowKeys.splice(i, 1);
+				//player.isDead = true;
+				break;
+			}
+			
+		}
+	for(var i=0; i<exits.length; i++)
+		{
+		if(intersects(exits[i].position.x, exits[i].position.y, TILE, TILE,
+					player.position.x, player.position.y, player.width/2, player.height/2)== true
+					&& blueLife == true
+					&& greenLife == true
+					&& redLife == true
+					&& yellowLife == true)
+			{
+				context.fillStyle = "#000";
+				context.font="78px Arial";
+				context.fillText("YOU WIN", 200, 240);
+			}
+		}
+	
+	
+	//DRAW
+	drawMap();
+	player.draw();
+	// draw the FPS
+	context.fillStyle = "#f00";
+	context.font="14px Arial";
+	context.fillText("FPS: " + fps, 5, 20, 100);
 	
 	for(var i=0; i<bullets.length; i++)
 	{
 		bullets[i].draw(deltaTime);
 	}
+	//KeyLives
+	//blue
+	if(blueLife == true)
+	{
+		context.drawImage(blueHud.image, 10, 10);
+	}
+	else
+	{
+		context.drawImage(blueHudDis.image, 10, 10);
+	}
+	//green
+	if(greenLife == true)
+	{
+		context.drawImage(greenHud.image, 60, 10);
+	}
+	else
+	{
+		context.drawImage(greenHudDis.image, 60, 10);
+	}
+	//red
+	if(redLife == true)
+	{
+		context.drawImage(redHud.image, 110, 10);
+	}
+	else
+	{
+		context.drawImage(redHudDis.image, 110, 10);
+	}
+	//yellow
+	if(yellowLife == true)
+	{
+		context.drawImage(yellowHud.image, 160, 10);
+	}
+	else
+	{
+		context.drawImage(yellowHudDis.image, 160, 10);
+	}
+	
+	
+	//triggers
+	//exit
+	for(var i=0; i<exits.length; i++)
+	{
+		exits[i].draw(deltaTime);
+	}
+	//blue
+	for(var i=0; i<blueKeys.length; i++)
+	{
+		blueKeys[i].draw(deltaTime);
+	}
+	//green
+	for(var i=0; i<greenKeys.length; i++)
+	{
+		greenKeys[i].draw(deltaTime);
+	}
+	//red
+	for(var i=0; i<redKeys.length; i++)
+	{
+		redKeys[i].draw(deltaTime);
+	}
+	//yellow
+	for(var i=0; i<yellowKeys.length; i++)
+	{
+		yellowKeys[i].draw(deltaTime);
+	}
+	//enemies
+	for(var i=0; i<enemies.length; i++)
+	{
+		enemies[i].draw(deltaTime);
+	}
+	
+	
+	//score
+	context.fillStyle = "yellow";
+	context.font="32px Arial";
+	var scoreText = "Score: " + score;
+	context.fillText(scoreText, SCREEN_WIDTH - 170, 500);
+	
+	//life counter
+	for(var i=0; i<lives; i++)
+	{
+		context.drawImage(heartImage, 20 + ((heartImage.width+2)*i), 450);
+	}
+	if(player.isDead == false)
+	{
+		if(player.position.y > SCREEN_HEIGHT)
+		{
+				player.isDead == true;
+				lives -= 1;
+				player.position.set(35, 250);
+		}
+		if(lives == 0)
+		{
+			context.fillStyle = "#000";
+			context.font="78px Arial";
+			context.fillText("YOU DEAD", 200, 240);
+		}		
+		
+	}
 }
+
+function runSplash(deltaTime)
+{
+	context.fillStyle = "#ccc";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	
+	if(keyboard.isKeyDown(keyboard.KEY_SHIFT) == true) {
+		gameState = STATE_GAME;
+		return;
+	}
+	
+	context.fillStyle = "#000";
+	context.font="24px Arial";
+	context.fillText("SPLASH SCREEN", 200, 240);
+}
+
+function runGame(deltaTime)
+{
+//background
+	context.fillStyle = "#ccc";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	
+	//deltaTime
+	var deltaTime = getDeltaTime();
+	
+	//SWITCHING GAME STATES
+	switch(gameState)
+	{
+		case STATE_SPLASH:
+			runSplash(deltaTime);
+			break;
+		case STATE_GAME:
+			runGame(deltaTime);
+			break;
+		case STATE_GAMEOVER:
+			runGameOver(deltaTime);
+			break;
+	}
+	
+	
+}
+
+function runGameOver(deltaTime)
+{
+	context.fillStyle = "#ccc";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	
+	context.fillStyle = "#000";
+	context.font="24px Arial";
+	context.fillText("GAME OVER", 200, 240);
+}
+
 
 //initialize AFTER run function
 initialize();
