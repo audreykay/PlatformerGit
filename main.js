@@ -49,6 +49,7 @@ var blueHud = new BlueHud();
 var STATE_SPLASH = 0;
 var STATE_GAME = 1;
 var STATE_GAMEOVER = 2;
+var STATE_GAMEWIN = 3;
 var gameState = STATE_SPLASH;
 
 var LAYER_COUNT = 3;
@@ -96,6 +97,28 @@ var JUMP = METER * 1500;
 
 var musicBackground;
 var sfxFire;
+
+//title image
+var titleScreen = {
+	image: document.createElement("img"),
+	width: 640,
+	height: 525
+};
+titleScreen.image.src = "titleScreen.png";
+//gameover image
+var gameOverScreen = {
+	image: document.createElement("img"),
+	width: 640,
+	height: 525
+};
+gameOverScreen.image.src = "gameOverScreen.png";
+//gamewin image
+var gameWinScreen = {
+	image: document.createElement("img"),
+	width: 640,
+	height: 525
+};
+gameWinScreen.image.src = "gameWinScreen.png";
 
 //HUD variables
 var heartImage = document.createElement("img");
@@ -450,6 +473,10 @@ function run()
 		case STATE_GAMEOVER:
 			runGameOver(deltaTime);
 			break;
+		case STATE_GAMEWIN:
+			runGameWin(deltaTime);
+			break;
+			
 	}
 }
 
@@ -463,17 +490,15 @@ function runSplash(deltaTime)
 		return;
 	}
 	
-	context.fillStyle = "#000";
-	context.font="24px Arial";
-	context.fillText("PRESS SHIFT TO START", 200, 240);
+	context.drawImage(titleScreen.image, 0, 0);
 }
 
 function runGame(deltaTime)
 {
-		context.fillStyle = "#ccc";
+	context.fillStyle = "#ccc";
 	context.fillRect(0, 0, canvas.width, canvas.height);
 
-	var deltaTime = getDeltaTime();
+	//var deltaTime = getDeltaTime();
 	
 	//UPDATE
 	player.update(deltaTime);
@@ -625,9 +650,8 @@ function runGame(deltaTime)
 					&& redLife == true
 					&& yellowLife == true)
 			{
-				context.fillStyle = "#000";
-				context.font="78px Arial";
-				context.fillText("YOU WIN", 200, 240);
+				gameState = STATE_GAMEWIN;
+				return;
 			}
 		}
 	
@@ -640,6 +664,11 @@ function runGame(deltaTime)
 	context.font="14px Arial";
 	context.fillText("FPS: " + fps, 5, 20, 100);
 	
+	//enemies
+	for(var i=0; i<enemies.length; i++)
+	{
+		enemies[i].draw(deltaTime);
+	}
 	for(var i=0; i<bullets.length; i++)
 	{
 		bullets[i].draw(deltaTime);
@@ -709,11 +738,7 @@ function runGame(deltaTime)
 	{
 		yellowKeys[i].draw(deltaTime);
 	}
-	//enemies
-	for(var i=0; i<enemies.length; i++)
-	{
-		enemies[i].draw(deltaTime);
-	}
+	
 	
 	
 	//score
@@ -737,9 +762,8 @@ function runGame(deltaTime)
 		}
 		if(lives == 0)
 		{
-			context.fillStyle = "#000";
-			context.font="78px Arial";
-			context.fillText("YOU DEAD", 200, 240);
+			gameState = STATE_GAMEOVER;
+			return;
 		}		
 		
 	}
@@ -752,9 +776,15 @@ function runGameOver(deltaTime)
 	context.fillStyle = "#ccc";
 	context.fillRect(0, 0, canvas.width, canvas.height);
 	
-	context.fillStyle = "#000";
-	context.font="24px Arial";
-	context.fillText("GAME OVER", 200, 240);
+	context.drawImage(gameOverScreen.image, 0, 0);
+}
+
+function runGameWin(deltaTime)
+{
+	context.fillStyle = "#ccc";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	
+	context.drawImage(gameWinScreen.image, 0, 0);
 }
 
 
