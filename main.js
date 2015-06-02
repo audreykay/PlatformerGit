@@ -430,6 +430,46 @@ function drawMap()
 //run function
 function run()
 {
+	
+	//background
+	context.fillStyle = "#ccc";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	
+	//deltaTime
+	var deltaTime = getDeltaTime();
+	
+	//SWITCHING GAME STATES
+	switch(gameState)
+	{
+		case STATE_SPLASH:
+			runSplash(deltaTime);
+			break;
+		case STATE_GAME:
+			runGame(deltaTime);
+			break;
+		case STATE_GAMEOVER:
+			runGameOver(deltaTime);
+			break;
+	}
+}
+
+function runSplash(deltaTime)
+{
+	context.fillStyle = "#ccc";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	
+	if(keyboard.isKeyDown(keyboard.KEY_SHIFT) == true) {
+		gameState = STATE_GAME;
+		return;
+	}
+	
+	context.fillStyle = "#000";
+	context.font="24px Arial";
+	context.fillText("SPLASH SCREEN", 200, 240);
+}
+
+function runGame(deltaTime)
+{
 		context.fillStyle = "#ccc";
 	context.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -702,45 +742,6 @@ function run()
 			context.fillText("YOU DEAD", 200, 240);
 		}		
 		
-	}
-}
-
-function runSplash(deltaTime)
-{
-	context.fillStyle = "#ccc";
-	context.fillRect(0, 0, canvas.width, canvas.height);
-	
-	if(keyboard.isKeyDown(keyboard.KEY_SHIFT) == true) {
-		gameState = STATE_GAME;
-		return;
-	}
-	
-	context.fillStyle = "#000";
-	context.font="24px Arial";
-	context.fillText("SPLASH SCREEN", 200, 240);
-}
-
-function runGame(deltaTime)
-{
-//background
-	context.fillStyle = "#ccc";
-	context.fillRect(0, 0, canvas.width, canvas.height);
-	
-	//deltaTime
-	var deltaTime = getDeltaTime();
-	
-	//SWITCHING GAME STATES
-	switch(gameState)
-	{
-		case STATE_SPLASH:
-			runSplash(deltaTime);
-			break;
-		case STATE_GAME:
-			runGame(deltaTime);
-			break;
-		case STATE_GAMEOVER:
-			runGameOver(deltaTime);
-			break;
 	}
 	
 	
