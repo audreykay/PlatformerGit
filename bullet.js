@@ -25,11 +25,9 @@ Bullet.prototype.update = function(deltaTime)
 Bullet.prototype.draw = function()
 {
 		var screenX = this.position.x - worldOffsetX;
-	//this.sprite.draw(context, screenX, this.position.y);
+	
 	context.save();
 			context.translate(player.x, player.y);
 			this.sprite.draw(context, screenX, this.position.y);
-			//context.drawImage(
-					//player.image, -player.width/2, -player.height/2);
-			context.restore();
+	context.restore();
 }
