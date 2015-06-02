@@ -465,7 +465,7 @@ function runSplash(deltaTime)
 	
 	context.fillStyle = "#000";
 	context.font="24px Arial";
-	context.fillText("SPLASH SCREEN", 200, 240);
+	context.fillText("PRESS SHIFT TO START", 200, 240);
 }
 
 function runGame(deltaTime)
